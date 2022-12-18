@@ -1,14 +1,7 @@
-import strutils
-
 type
     Pick = enum None Rock Paper Scissors
-    Fight = tuple[elf: char, me: char]
+    Fight = tuple[elf: Pick, me: Pick]
     Strategy = seq[Fight]
-
-
-proc fileParser(fileName: string): Strategy = 
-    for line in lines(fileName):
-        result.add((line[0], line[2]))
 
 proc getPick(pick: char): Pick = 
     case pick:
@@ -21,10 +14,41 @@ proc getPick(pick: char): Pick =
         else:
             return None
 
+proc getMyPick(elfPick: Pick, pick: char): Pick =
+    case elfPick:
+        of Rock:
+            case pick:
+                of 'X': return Scissors
+                of 'Y': return elfPick
+                of 'Z': return Paper
+                else: return None
+        of Paper:
+            case pick:
+                of 'X': return Rock
+                of 'Y': return elfPick
+                of 'Z': return Scissors
+                else: return None
+        of Scissors:
+            case pick:
+                of 'X': return Paper
+                of 'Y': return elfPick
+                of 'Z': return Rock
+                else: return None
+        else: return None
+
+proc fileParser(fileName: string): Strategy = 
+    for line in lines(fileName):
+        result.add((getPick(line[0]), getPick(line[2])))
+
+proc fileParser2(fileName: string): Strategy = 
+    for line in lines(fileName):
+        let elfPick: Pick = getPick(line[0])
+        result.add(((elfPick), getMyPick(elfPick ,line[2])))
+
 proc match(fight: Fight): int = 
     let 
-        mePick: Pick = getPick(fight.me)
-        elfPick: Pick = getPick(fight.elf)
+        mePick: Pick = fight.me
+        elfPick: Pick = fight.elf
     case mePick:
         of Rock:
             result += 1
@@ -52,14 +76,23 @@ proc match(fight: Fight): int =
 proc getAllResults(strat: Strategy): int = 
     for fight in strat:
         result = result + match(fight)
-    
 
-proc main() = 
+
+proc part1() = 
     let 
         matches: Strategy = fileParser("input.txt")
         score: int = getAllResults(matches)
-    echo "Result is: ", score
+    echo "Answer for part1 is: ", score
+
+proc part2() =
+    let 
+        matches: Strategy = fileParser2("input.txt")
+        score: int = getAllResults(matches)
+    echo "Answer for part2 is: ", score
+
+
 
 
 if isMainModule:
-    main()
+    part1()
+    part2()
