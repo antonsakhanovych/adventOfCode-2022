@@ -1,0 +1,5 @@
+* Advent Of Code
+
+- My advent of code solutions!
+  
+- Solutions are ugly but they work ;)
