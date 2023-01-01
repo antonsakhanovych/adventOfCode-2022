@@ -84,21 +84,41 @@ proc executeActions(stacks: var AllStacks, instructions: ListOfInstructions) =
         for i in 1 .. numToMove:
             stacks[numTo].add(stacks[numFrom].pop())
 
+proc executeActionsMachine(stacks: var AllStacks, instructions: ListOfInstructions) =
+  for instruction in instructions:
+    let 
+      numToMove = instruction[0]
+      numFrom = instruction[1] - 1
+      numTo = instruction[2] - 1
+    var boxToMove: seq[string] = @[]
+    for i in 1 .. numToMove:
+      boxToMove.add(stacks[numFrom].pop())
+    for i in 1 .. numToMove:
+      stacks[numTo].add(boxToMove.pop())
+    
+            
 proc show(stacks: AllStacks): string =
     for stack in stacks:
         result.add(stack[^1])
 
-proc part1() =
-    let 
-        content = fileParser("input.txt")
-        (stacks, instructions) = divide(content)
-        interpretedStacks = interpretStackLines(stacks)
-        allInstructions = getInstructions(instructions)
-    var createdStacks = createStacks(interpretedStacks)
-    executeActions(createdStacks, allInstructions)
-    let result = show(createdStacks)
-    echo "Answer for part 1 is: ", result
-    
+proc part1(stacks: var AllStacks, instructions: ListOfInstructions) =
+  executeActions(stacks, instructions)
+  echo "Answer for part 1 is: ", show(stacks)
+
+proc part2(stacks: var AllStacks, instructions: ListOfInstructions) =
+  executeActionsMachine(stacks, instructions)
+  echo "Answer for part 2 is: ", show(stacks)
+  
 
 if isMainModule:
-    part1()
+  let 
+    content = fileParser("input.txt")
+    (stacks, instructions) = divide(content)
+    interpretedStacks = interpretStackLines(stacks)
+    allInstructions = getInstructions(instructions)
+  var
+    createdStacksPart1 = createStacks(interpretedStacks)
+    createdStacksPart2 = createStacks(interpretedStacks)
+  
+  part1(createdStacksPart1, allInstructions)
+  part2(createdStacksPart2, allInstructions)
