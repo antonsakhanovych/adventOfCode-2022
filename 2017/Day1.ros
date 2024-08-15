@@ -1,0 +1,44 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '() :silent t)
+  )
+
+(defpackage :ros.script.Day1.3932581022
+  (:use :cl))
+(in-package :ros.script.Day1.3932581022)
+
+(defun read-input (file-path)
+  (with-open-file (in file-path
+                      :direction :input)
+    (let ((result (make-array 0 :adjustable t
+                                :fill-pointer 0)))
+      (loop for ch = (digit-char-p (read-char in nil))
+            while ch
+            do (vector-push-extend ch result))
+      result)))
+
+
+(defmacro solve (fn-name next-dig-fn)
+  `(defun ,fn-name (content)
+    (let ((len (length content))
+          (sum 0))
+      (dotimes (i len)
+        (let ((item (elt content i))
+              (next (elt content (mod (funcall ,next-dig-fn i) len))))
+          (if (= item next) (incf sum item))))
+      sum)))
+
+(solve part1 #'(lambda (x) (+ 1 x)))
+(solve part2 #'(lambda (x) (+ x (floor len 2))))
+
+(defun main (&rest argv)
+  (let ((file-name (elt argv 0)))
+    (if (null file-name) (return-from main)
+        (let ((content (read-input file-name)))
+          (format t "Part1: ~a~%" (part1 content))
+          (format t "Part2: ~a~%" (part2 content))))))
