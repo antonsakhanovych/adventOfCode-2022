@@ -1,0 +1,43 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '() :silent t)
+  )
+
+(defpackage :ros.script.day3.3932921643
+  (:use :cl))
+(in-package :ros.script.day3.3932921643)
+
+(defun calculate-edge-size (level)
+  (+ (* 2 level) 1))
+
+(defun calculate-level (number)
+  (let* ((k (ceiling (sqrt number)))
+         (k (if (oddp k) k (1+ k))))
+    (/ (- k 1) 2)))
+
+(defun get-level-centers (level)
+  (let* ((edge-size (calculate-edge-size level))
+         (num (- (expt edge-size 2) (floor edge-size 2)))
+         (result ()))
+    (dotimes (i 4)
+      (push num result)
+      (decf num (- edge-size 1)))
+    result))
+
+(defun part1 (number)
+  (let* ((level (calculate-level number))
+        (centers (get-level-centers level))
+        (results ()))
+    (dolist (center centers)
+      (let ((abs-diff (abs (- number center))))
+        (push abs-diff results)))
+    (+ level (apply #'min results))))
+
+
+(defun main (&rest argv)
+  (declare (ignorable argv))))
